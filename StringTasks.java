@@ -1,65 +1,76 @@
 package taskes;
 
+import java.util.Scanner;
+
 public class StringTasks {
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
         // 1. Test customSplit
-        String test = "mariam,noura,sama";
-        String[] result = customSplit(test, ',');
-        System.out.println("Result of customSplit:");
+        System.out.println("enter a string to split it:");
+        String test = scanner.nextLine();
+        System.out.println("enter the delimiter character:");
+        char delimiter = scanner.nextLine().charAt(0);
+
+        String[] result = customSplit(test, delimiter);
+        System.out.println("result of customSplit:");
         for (int i = 0; i < result.length; i++) {
-            System.out.println("word " + (i + 1) + " = " + result[i]);
+            System.out.println("Word " + (i + 1) + " = " + result[i]);
         }
 
         // 2. Test countChar
-        System.out.println("\nResult of countChar:");
-        String sample = "MAriam Turk";
+        System.out.println("\nenter a string to count characters from:");
+        String sample = scanner.nextLine();
 
-        System.out.println("Input-> \"" + sample + "\"");
+        System.out.println("enter the character to count:");
+        char ch = scanner.nextLine().charAt(0);
 
-        System.out.println("Ignore case (m): " + countChar(sample, 'm', true));     // Expected: 4 (counts l and L)
-        System.out.println("Case sensitive (m): " + countChar(sample, 'm', false)); // Expected: 2
-        System.out.println("Case sensitive (T): " + countChar(sample, 'T', false)); // Expected: 2
-        System.out.println("Case sensitive (n): " + countChar(sample, 'n', false)); // Expected: 0
+        System.out.println("ignore case? (true/false):");
+        String choice = scanner.nextLine();
+        boolean ignoreCase = choice.equals("true");
+
+        int count = countChar(sample, ch, ignoreCase);
+        System.out.println("character count: " + count);
 
         // 3. Test reverseWords
-        System.out.println("\nResult of reverseWords:");
-        String original = "Java is very fun";
-        System.out.println("Original: " + original);
-        System.out.println("Reversed: " + reverseWords(original)); // Expected: "fun very is Java"
+        System.out.println("\nenter a sentence to reverse it:");
+        String original = scanner.nextLine();
+
+        String reversed = reverseWords(original);
+        System.out.println("reversed sentence: " + reversed);
+
+        scanner.close();
     }
 
-    // 1. Splits a string by a specific character (without using split())
+    // splits a string by a specific character
     public static String[] customSplit(String str, char delimiter) {
-        if (str == null || str.isEmpty())
+        // if the str is null
+        if (str == null || str.length() == 0)
             return new String[0];
-
-        // Count how many parts we will have
+        // this to know how any part i will split    
         int count = 1;
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) == delimiter)
                 count++;
         }
-
+        // inital array to put the part in it 
         String[] parts = new String[count];
         int partIndex = 0;
         int start = 0;
-
-        // Extract substrings manually
+        // loop to find the delim and split the words in the aaray 
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) == delimiter) {
-                parts[partIndex++] = str.substring(start, i);
+                parts[partIndex++] = manualSubstring(str, start, i);
                 start = i + 1;
             }
         }
-
-        // Add the last part
-        parts[partIndex] = str.substring(start);
+        // this for the final word in the array
+        parts[partIndex] = manualSubstring(str, start, str.length());
         return parts;
     }
 
-    // 2. Counts how many times a character appears, with or without ignoring case
+    // counts how many character appears with or without ignoring case
     public static int countChar(String str, char ch, boolean ignoreCase) {
         if (str == null)
             return 0;
@@ -67,10 +78,13 @@ public class StringTasks {
         int count = 0;
         for (int i = 0; i < str.length(); i++) {
             char current = str.charAt(i);
+            // here to ignore the case 
             if (ignoreCase) {
-                if (Character.toLowerCase(current) == Character.toLowerCase(ch))
+                if (manualToLower(current) == manualToLower(ch))
                     count++;
-            } else {
+            }
+            // not ignor the case 
+             else {
                 if (current == ch)
                     count++;
             }
@@ -78,25 +92,23 @@ public class StringTasks {
         return count;
     }
 
-    // 3. Reverses the order of words in a sentence (no reversing characters inside words)
+    // reverses the order of words in sentence 
     public static String reverseWords(String sentence) {
-        if (sentence == null || sentence.isEmpty())
+        if (sentence == null || sentence.length() == 0)
             return sentence;
 
         int len = sentence.length();
-        String[] words = new String[100]; // Max 100 words
+        String[] words = new String[100];
         int wordCount = 0;
         int start = 0;
-
-        // Manually extract words without using split()
+        // to know the words we have 
         for (int i = 0; i <= len; i++) {
             if (i == len || sentence.charAt(i) == ' ') {
-                words[wordCount++] = sentence.substring(start, i);
+                words[wordCount++] = manualSubstring(sentence, start, i);
                 start = i + 1;
             }
         }
-
-        //  reversed sentence
+        // revers the words in this loop 
         StringBuilder sb = new StringBuilder();
         for (int i = wordCount - 1; i >= 0; i--) {
             sb.append(words[i]);
@@ -105,5 +117,22 @@ public class StringTasks {
         }
 
         return sb.toString();
+    }
+
+    // fun to extract substring manually
+    public static String manualSubstring(String str, int start, int end) {
+        char[] chars = new char[end - start];
+        for (int i = start; i < end; i++) {
+            chars[i - start] = str.charAt(i);
+        }
+        return new String(chars);
+    }
+
+    // convert character to lowercase by ascii
+    public static char manualToLower(char c) {
+        if (c >= 'A' && c <= 'Z') {
+            return (char) (c + 32);
+        }
+        return c;
     }
 }
